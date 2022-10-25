@@ -83,48 +83,62 @@ struct ContentView: View {
     }
     
     var body: some View {
-        VStack {
-            Text("Rock Paper Scissors").font(.largeTitle)
-                .padding()
-            Text("Score: \(playerScore)")
-                .padding()
-            Text("Opponent's Move: ") + Text(moveEmoji(move: opponentMove)).font(.largeTitle)
-            Text("Goal this round: \(shouldWin ? "WIN" : "LOSE")")
-                .padding(.bottom)
+        ZStack {
+            LinearGradient(colors: [.teal, .mint, .black], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
             
-            ForEach (gameMoves.allCases) { move in
-                Button(moveEmoji(move: move)) {
-                    selectMove(playerMove: move)
+            VStack {
+                VStack {
+                    Text("Rock Paper Scissors").font(.largeTitle)
+                        .padding()
+                    Text("Score: \(playerScore)").font(.headline)
                 }
-                .font(.largeTitle)
-                .padding(.vertical)
-                .frame(minWidth: 150)
-                .foregroundStyle(.primary)
-                .background(Color.indigo)
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .padding()
+                
+                VStack {
+                    Text("Opponent's Move: ") + Text(moveEmoji(move: opponentMove)).font(.largeTitle)
+                    Text("Goal this round: ") + Text(shouldWin ? "WIN" : "LOSE").bold()
+                    
+                    ForEach (gameMoves.allCases) { move in
+                        Button(moveEmoji(move: move)) {
+                            selectMove(playerMove: move)
+                        }
+                        .font(.largeTitle)
+                        .padding(.vertical)
+                        .frame(minWidth: 150)
+                        .background(Color.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                        .padding()
+                    }
+                    
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(.thinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                Spacer()
             }
-            Spacer()
+            .padding()
+            .alert(scoreTitle, isPresented: $showingScore) {
+                Button("Continue", action: setupRound)
+            } message: {
+                Text(scoreTitle == "Correct!"
+                     ? "Good job!"
+                     : "The correct answer was \(moveEmoji(move: correctInput))."
+                )
+            }
+            .alert("Game over!", isPresented: $gameOver) {
+                Button("New Game", action: newGame)
+            } message: {
+                Text("\(scoreTitle) Your final score was \(playerScore)")
+            }
         }
-        .padding()
-        .alert(scoreTitle, isPresented: $showingScore) {
-            Button("Continue", action: setupRound)
-        } message: {
-            Text(scoreTitle == "Correct!"
-                 ? "Good job!"
-                 : "The correct answer was \(moveEmoji(move: correctInput))."
-            )
-        }
-        .alert("Game over!", isPresented: $gameOver) {
-            Button("New Game", action: newGame)
-        } message: {
-            Text("\(scoreTitle) Your final score was \(playerScore)")
-        }
+        .foregroundColor(.black)
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+        ContentView().preferredColorScheme(.dark)
     }
 }
